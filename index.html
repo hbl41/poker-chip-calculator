@@ -30,20 +30,34 @@
       </div>
     </div>
 
-    <table id="chip-table">
-      <thead>
-        <tr>
-          <th>Color</th>
-          <th>Value</th>
-          <th>Chips per Player</th>
-          <th>Total Owned</th>
-          <th>Chips Needed</th>
-          <th>Chips Left</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="chip-rows"></tbody>
-    </table>
+    <div class="table-wrap" role="region" aria-label="Chip table" tabindex="0">
+      <table id="chip-table">
+        <thead>
+          <tr>
+            <th>Color</th>
+            <th>Value</th>
+            <th>
+              <span class="th-full">Chips per Player</span>
+              <span class="th-short">Per Player</span>
+            </th>
+            <th>
+              <span class="th-full">Total Owned</span>
+              <span class="th-short">Owned</span>
+            </th>
+            <th>
+              <span class="th-full">Chips Needed</span>
+              <span class="th-short">Needed</span>
+            </th>
+            <th>
+              <span class="th-full">Chips Left</span>
+              <span class="th-short">Left</span>
+            </th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="chip-rows"></tbody>
+      </table>
+    </div>
 
     <div class="totals">
       <p><span>Buy in per player</span><span id="buy-in">0</span></p>
