@@ -1,5 +1,3 @@
-/* Clean dashboard and inventory styles without highlighting */
-
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -9,7 +7,7 @@ body {
 }
 
 .container {
-  max-width: 980px;
+  max-width: 1020px;
   margin: 0 auto;
   background: #fff;
   border: 1px solid #e1e1e1;
@@ -93,8 +91,16 @@ input::-webkit-inner-spin-button {
   font-size: 16px;
 }
 
+#bb-amount {
+  width: 110px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
 .count-pill {
-  min-width: 40px;
+  min-width: 80px;
   text-align: center;
   padding: 8px;
   border: 1px solid #ccc;
@@ -103,7 +109,6 @@ input::-webkit-inner-spin-button {
   font-weight: 600;
 }
 
-/* Tables */
 .table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -116,11 +121,11 @@ input::-webkit-inner-spin-button {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 760px;
+  min-width: 980px;
 }
 
 #inv-table {
-  min-width: 620px;
+  min-width: 820px;
 }
 
 thead {
@@ -178,7 +183,11 @@ button.remove-inv-row:hover {
   background: #dcdcdc;
 }
 
-/* Totals section */
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .totals {
   margin-top: 16px;
   padding: 12px 16px;
@@ -197,7 +206,6 @@ button.remove-inv-row:hover {
   font-weight: 700;
 }
 
-/* Inventory total chips owned */
 .inventory-totals {
   margin-top: 12px;
   padding: 12px 16px;
@@ -226,5 +234,8 @@ button.remove-inv-row:hover {
   }
   .totals {
     grid-template-columns: 1fr;
+  }
+  table {
+    min-width: 980px;
   }
 }
