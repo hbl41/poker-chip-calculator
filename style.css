@@ -1,26 +1,52 @@
+/*
+ * Dashboard theme styles
+ * This stylesheet converts the plain calculator into a utility driven dashboard.
+ * It introduces neutral backgrounds, card like panels and color coding for chip rows.
+ * The design aims to offer high contrast for readability and subtle color accents for quick visual parsing.
+ */
+
 body {
   font-family: Arial, sans-serif;
-  padding: 20px;
   margin: 0;
+  padding: 20px;
+  background-color: #f5f5f5;
+  color: #333;
 }
 
+/* Main container becomes a card on a light background */
 .container {
   max-width: 960px;
-  margin: auto;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e1e1e1;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* Title styling */
 h1 {
   text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #444;
 }
 
+/* Controls panel appears as a light card */
 .controls {
   display: flex;
-  gap: 14px;
+  gap: 16px;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 12px;
 }
 
+/* Stepper groups align labels and controls neatly */
 .control-group {
   display: flex;
   align-items: center;
@@ -29,6 +55,7 @@ h1 {
 
 .control-label {
   font-weight: bold;
+  color: #555;
 }
 
 .stepper {
@@ -39,74 +66,156 @@ h1 {
 
 .step-btn {
   padding: 6px 10px;
-  min-width: 40px;
+  min-width: 36px;
   font-size: 18px;
   line-height: 1;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
 }
 
+.step-btn:hover {
+  background: #e0e0e0;
+}
+
+/* Numeric input for players */
+#player-count {
+  width: 80px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Chip count pill */
 .count-pill {
-  display: inline-block;
   min-width: 34px;
   text-align: center;
   padding: 6px 8px;
   border: 1px solid #ccc;
   background: #f2f2f2;
-  border-radius: 6px;
+  border-radius: 4px;
   font-weight: bold;
+  color: #333;
 }
 
-.controls input[type="number"] {
-  width: 90px;
-  padding: 6px;
-}
-
+/* Table styles */
 #chip-table {
   width: 100%;
   border-collapse: collapse;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-#chip-table th,
-#chip-table td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: left;
-  vertical-align: middle;
+#chip-table thead {
+  background-color: #444;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-#chip-table input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 6px;
-}
-
-.summary {
-  margin-top: 14px;
-  border: 1px solid #ccc;
+#chip-table th {
   padding: 10px;
+  text-align: left;
+  font-weight: 600;
 }
 
-.summary-row {
+#chip-table td {
+  padding: 8px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+/* Alternate row shading for readability */
+#chip-table tr:nth-child(even) td {
+  background-color: #fafafa;
+}
+
+/* Remove button styles */
+button.remove-row {
+  padding: 4px 10px;
+  background: #eaeaea;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button.remove-row:hover {
+  background: #dcdcdc;
+}
+
+/* Summary styling as a card */
+.totals {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.totals p {
+  margin: 4px 0;
   display: flex;
   justify-content: space-between;
-  padding: 6px 0;
+  font-weight: 600;
+  color: #444;
 }
 
-.color-negative {
-  color: red;
+/* Negative chips left */
+.chips-left.color-negative {
+  color: #d00;
   font-weight: bold;
 }
 
-@media (max-width: 640px) {
-  body {
-    padding: 12px;
-  }
+/* Color coded chip rows */
+tr.chip-white td {
+  background-color: #ffffff;
+  color: #333;
+}
 
-  .controls input[type="number"] {
-    width: 80px;
-  }
+tr.chip-red td {
+  background-color: #ffe5e5;
+  color: #a00;
+}
 
-  #chip-table th:nth-child(7),
-  #chip-table td:nth-child(7) {
-    width: 90px;
+tr.chip-pink td {
+  background-color: #ffeef7;
+  color: #c06;
+}
+
+tr.chip-blue td {
+  background-color: #e7f1ff;
+  color: #0756a4;
+}
+
+tr.chip-green td {
+  background-color: #e9f6e9;
+  color: #0a662a;
+}
+
+tr.chip-black td {
+  background-color: #f0f0f0;
+  color: #222;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+  }
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  #chip-table th,
+  #chip-table td {
+    font-size: 14px;
+    padding: 6px;
+  }
+  .totals {
+    grid-template-columns: 1fr;
   }
 }
