@@ -1,5 +1,4 @@
 (function() {
-  // Cache elements
   const playerCountInput = document.getElementById('player-count');
   const playerMinusBtn   = document.getElementById('player-minus');
   const playerPlusBtn    = document.getElementById('player-plus');
@@ -19,7 +18,8 @@
   const chipsInPlayEl = document.getElementById('chips-in-play');
   const valueInPlayEl = document.getElementById('value-in-play');
 
-  // Default inventory data
+  const invTotalOwnedEl = document.getElementById('inv-total-owned');
+
   const DEFAULT_INVENTORY = [
     { name: 'White',  value: 0, owned: 500 },
     { name: 'Pink',   value: 0, owned: 500 },
@@ -29,10 +29,9 @@
     { name: 'Orange', value: 0, owned: 500 }
   ];
 
-  // Local storage keys
-  const LS_PLAYERS_KEY = 'pokerChipPlayers_v4';
-  const LS_ROWS_KEY    = 'pokerChipRows_v4';
-  const LS_INV_KEY     = 'pokerChipInventory_v4';
+  const LS_PLAYERS_KEY = 'pokerChipPlayers_v5';
+  const LS_ROWS_KEY    = 'pokerChipRows_v5';
+  const LS_INV_KEY     = 'pokerChipInventory_v5';
 
   function toInt(v, fallback) {
     const n = parseInt(v, 10);
@@ -45,6 +44,11 @@
 
   function getPlayers() {
     return Math.max(1, toInt(playerCountInput.value, 1));
+  }
+
+  function formatCurrency(n) {
+    const num = Number.isFinite(n) ? n : 0;
+    return '$' + num.toFixed(2);
   }
 
   function dashboardRowCount() {
@@ -63,9 +67,6 @@
     if (invCountEl) invCountEl.textContent = String(inventoryRowCount());
   }
 
-  // No row highlighting in this version
-  function applyColorClass() {}
-
   function getInventoryMap() {
     const map = Object.create(null);
     invRowsEl.querySelectorAll('tr').forEach(tr => {
@@ -83,19 +84,18 @@
     return map;
   }
 
-  function ensureInventoryColorExists(colorName) {
-    const key = normalizeColorName(colorName);
-    if (!key) return;
-    const map = getInventoryMap();
-    if (Object.prototype.hasOwnProperty.call(map, key)) return;
-    addInventoryRow({ name: colorName, value: 0, owned: 0 });
-    saveState();
+  function updateInventoryTotals() {
+    let totalOwned = 0;
+    invRowsEl.querySelectorAll('tr').forEach(tr => {
+      const owned = parseFloat(tr.querySelector('.inv-owned').value) || 0;
+      totalOwned += owned;
+    });
+    if (invTotalOwnedEl) invTotalOwnedEl.textContent = String(totalOwned);
   }
 
   function saveState() {
-    // Players
     localStorage.setItem(LS_PLAYERS_KEY, String(getPlayers()));
-    // Dashboard rows
+
     const dashboardData = [];
     chipRowsEl.querySelectorAll('tr').forEach(tr => {
       const selectEl    = tr.querySelector('.color-select');
@@ -105,7 +105,7 @@
       dashboardData.push({ color, perPlayer });
     });
     localStorage.setItem(LS_ROWS_KEY, JSON.stringify(dashboardData));
-    // Inventory rows
+
     const inventoryData = [];
     invRowsEl.querySelectorAll('tr').forEach(tr => {
       const name  = tr.querySelector('.inv-color').value;
@@ -116,49 +116,68 @@
     localStorage.setItem(LS_INV_KEY, JSON.stringify(inventoryData));
   }
 
-  function addDashboardRow(data = {}) {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>
-        <select class="color-select"></select>
-      </td>
-      <td><span class="chip-value">0</span></td>
-      <td><input class="chips-per-player" type="number" min="0" value="${data.perPlayer != null ? data.perPlayer : ''}"></td>
-      <td class="chips-needed">0</td>
-      <td class="chips-left">0</td>
-      <td><button class="remove-row" type="button">Remove</button></td>
-    `;
-    const selectEl    = tr.querySelector('.color-select');
-    const valueSpan   = tr.querySelector('.chip-value');
-    const perPlayerEl = tr.querySelector('.chips-per-player');
+  function refreshColorDropdownOptions() {
+    const colorNames = [];
+    invRowsEl.querySelectorAll('tr').forEach(tr => {
+      const name = tr.querySelector('.inv-color').value.trim();
+      if (name) colorNames.push(name);
+    });
 
-    function buildOptions(selectedColor) {
-      const currentValue = selectedColor || '';
-      const colorNames = [];
-      invRowsEl.querySelectorAll('tr').forEach(row => {
-        const name = row.querySelector('.inv-color').value.trim();
-        if (name) colorNames.push(name);
-      });
+    chipRowsEl.querySelectorAll('tr').forEach(tr => {
+      const selectEl = tr.querySelector('.color-select');
+      if (!selectEl) return;
+
+      const previous = selectEl.value;
+
       selectEl.innerHTML = '';
       const emptyOpt = document.createElement('option');
       emptyOpt.value = '';
       emptyOpt.textContent = '-- Select --';
       selectEl.appendChild(emptyOpt);
+
       colorNames.forEach(name => {
         const key = normalizeColorName(name);
         const opt = document.createElement('option');
         opt.value = key;
         opt.textContent = name;
-        if (key === currentValue) opt.selected = true;
         selectEl.appendChild(opt);
       });
-    }
+
+      const normalizedPrev = normalizeColorName(previous);
+      const availableKeys = colorNames.map(n => normalizeColorName(n));
+
+      selectEl.value = (previous && availableKeys.includes(normalizedPrev)) ? normalizedPrev : '';
+
+      const valueSpan = tr.querySelector('.chip-value');
+      const invMap = getInventoryMap();
+      const key = normalizeColorName(selectEl.value);
+      const invItem = (key && invMap[key]) ? invMap[key] : { value: 0, owned: 0 };
+      if (valueSpan) valueSpan.textContent = formatCurrency(invItem.value);
+    });
+
+    calculate();
+  }
+
+  function addDashboardRow(data = {}) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><select class="color-select"></select></td>
+      <td><span class="chip-value value-display">$0.00</span></td>
+      <td><input class="chips-per-player" type="number" min="0" value="${data.perPlayer != null ? data.perPlayer : ''}"></td>
+      <td class="chips-needed">0</td>
+      <td class="chips-left">0</td>
+      <td><button class="remove-row" type="button">Remove</button></td>
+    `;
+
+    const selectEl    = tr.querySelector('.color-select');
+    const valueSpan   = tr.querySelector('.chip-value');
+    const perPlayerEl = tr.querySelector('.chips-per-player');
 
     selectEl.addEventListener('change', () => {
       const invMap = getInventoryMap();
-      const key    = normalizeColorName(selectEl.value);
-      const invItem = key && invMap[key] ? invMap[key] : { value: 0, owned: 0 };
-      valueSpan.textContent = invItem.value;
+      const key = normalizeColorName(selectEl.value);
+      const invItem = (key && invMap[key]) ? invMap[key] : { value: 0, owned: 0 };
+      valueSpan.textContent = formatCurrency(invItem.value);
       calculate();
       saveState();
     });
@@ -170,22 +189,24 @@
 
     tr.querySelector('.remove-row').addEventListener('click', () => {
       tr.remove();
-      if (dashboardRowCount() === 0) {
-        addDashboardRow();
-      }
+      if (dashboardRowCount() === 0) addDashboardRow();
       calculate();
       updateDashboardCount();
       saveState();
     });
 
     chipRowsEl.appendChild(tr);
-    buildOptions(data.color ? normalizeColorName(data.color) : '');
+
+    refreshColorDropdownOptions();
+
     if (data.color) {
       selectEl.value = normalizeColorName(data.color);
-      const invMap  = getInventoryMap();
-      const invItem = invMap[normalizeColorName(data.color)] || { value: 0, owned: 0 };
-      valueSpan.textContent = invItem.value;
+      const invMap = getInventoryMap();
+      const key = normalizeColorName(selectEl.value);
+      const invItem = (key && invMap[key]) ? invMap[key] : { value: 0, owned: 0 };
+      valueSpan.textContent = formatCurrency(invItem.value);
     }
+
     calculate();
     updateDashboardCount();
   }
@@ -198,94 +219,60 @@
       <td><input class="inv-owned" type="number" min="0" value="${data.owned != null ? data.owned : ''}"></td>
       <td><button class="remove-inv-row" type="button">Remove</button></td>
     `;
+
     const colorInput = tr.querySelector('.inv-color');
     const valueInput = tr.querySelector('.inv-value');
     const ownedInput = tr.querySelector('.inv-owned');
 
     colorInput.addEventListener('input', () => {
-      applyColorClass(tr, colorInput.value);
       refreshColorDropdownOptions();
-      calculate();
       updateInventoryCount();
+      updateInventoryTotals();
+      calculate();
       saveState();
     });
 
     valueInput.addEventListener('input', () => {
+      refreshColorDropdownOptions();
       calculate();
       saveState();
     });
 
     ownedInput.addEventListener('input', () => {
+      updateInventoryTotals();
       calculate();
       saveState();
     });
 
     tr.querySelector('.remove-inv-row').addEventListener('click', () => {
       tr.remove();
-      if (inventoryRowCount() === 0) {
-        addInventoryRow({ name: '', value: 0, owned: 0 });
-      }
+      if (inventoryRowCount() === 0) addInventoryRow({ name: '', value: 0, owned: 0 });
       refreshColorDropdownOptions();
-      calculate();
       updateInventoryCount();
+      updateInventoryTotals();
+      calculate();
       saveState();
     });
 
     invRowsEl.appendChild(tr);
-    applyColorClass(tr, colorInput.value);
     updateInventoryCount();
-  }
-
-  function refreshColorDropdownOptions() {
-    const colorNames = [];
-    invRowsEl.querySelectorAll('tr').forEach(tr => {
-      const name = tr.querySelector('.inv-color').value.trim();
-      if (name) colorNames.push(name);
-    });
-    chipRowsEl.querySelectorAll('tr').forEach(tr => {
-      const selectEl = tr.querySelector('.color-select');
-      if (!selectEl) return;
-      const previous = selectEl.value;
-      selectEl.innerHTML = '';
-      const emptyOpt = document.createElement('option');
-      emptyOpt.value = '';
-      emptyOpt.textContent = '-- Select --';
-      selectEl.appendChild(emptyOpt);
-      colorNames.forEach(name => {
-        const key = normalizeColorName(name);
-        const opt = document.createElement('option');
-        opt.value = key;
-        opt.textContent = name;
-        selectEl.appendChild(opt);
-      });
-      const normalizedPrev = normalizeColorName(previous);
-      const availableKeys   = colorNames.map(name => normalizeColorName(name));
-      if (previous && availableKeys.includes(normalizedPrev)) {
-        selectEl.value = normalizedPrev;
-      } else {
-        selectEl.value = '';
-      }
-      const valueSpan = tr.querySelector('.chip-value');
-      const invMap    = getInventoryMap();
-      const invItem   = invMap[normalizeColorName(selectEl.value)] || { value: 0, owned: 0 };
-      if (valueSpan) valueSpan.textContent = invItem.value;
-    });
-    calculate();
+    updateInventoryTotals();
   }
 
   function clearDashboardRowInputs(tr) {
     const select = tr.querySelector('.color-select');
     if (select) select.value = '';
     const valueSpan = tr.querySelector('.chip-value');
-    if (valueSpan) valueSpan.textContent = '0';
+    if (valueSpan) valueSpan.textContent = '$0.00';
     const perPlayerInput = tr.querySelector('.chips-per-player');
     if (perPlayerInput) perPlayerInput.value = '';
   }
 
   function calculate() {
-    const players  = getPlayers();
-    const invMap   = getInventoryMap();
-    let buyInPerPlayer   = 0;
+    const players = getPlayers();
+    const invMap = getInventoryMap();
+
+    let buyInPerPlayer = 0;
     let totalChipsInPlay = 0;
 
     chipRowsEl.querySelectorAll('tr').forEach(tr => {
@@ -293,67 +280,66 @@
       const valueSpan   = tr.querySelector('.chip-value');
       const perPlayerEl = tr.querySelector('.chips-per-player');
 
-      const colorKey   = selectEl ? normalizeColorName(selectEl.value) : '';
-      const perPlayer  = parseFloat(perPlayerEl.value) || 0;
-      const invItem    = (colorKey && invMap[colorKey]) ? invMap[colorKey] : { value: 0, owned: 0 };
+      const colorKey = selectEl ? normalizeColorName(selectEl.value) : '';
+      const perPlayer = parseFloat(perPlayerEl.value) || 0;
 
-      if (valueSpan) valueSpan.textContent = invItem.value;
+      const invItem = (colorKey && invMap[colorKey]) ? invMap[colorKey] : { value: 0, owned: 0 };
+
+      if (valueSpan) valueSpan.textContent = formatCurrency(invItem.value);
 
       const chipsNeeded = players * perPlayer;
-      const chipsLeft   = invItem.owned - chipsNeeded;
+      const chipsLeft = invItem.owned - chipsNeeded;
 
-      const chipsNeededCell = tr.querySelector('.chips-needed');
-      const chipsLeftCell   = tr.querySelector('.chips-left');
-      if (chipsNeededCell) chipsNeededCell.textContent = chipsNeeded;
-      if (chipsLeftCell) chipsLeftCell.textContent = chipsLeft;
+      tr.querySelector('.chips-needed').textContent = chipsNeeded;
+      tr.querySelector('.chips-left').textContent = chipsLeft;
 
-      buyInPerPlayer   += invItem.value * perPlayer;
+      buyInPerPlayer += invItem.value * perPlayer;
       totalChipsInPlay += chipsNeeded;
     });
 
-    buyInEl.textContent       = buyInPerPlayer.toFixed(2);
-    chipsInPlayEl.textContent = totalChipsInPlay;
-    valueInPlayEl.textContent = (buyInPerPlayer * players).toFixed(2);
+    buyInEl.textContent = formatCurrency(buyInPerPlayer);
+    chipsInPlayEl.textContent = String(totalChipsInPlay);
+    valueInPlayEl.textContent = formatCurrency(buyInPerPlayer * players);
+
+    updateInventoryTotals();
   }
 
   function loadState() {
     const savedPlayers = localStorage.getItem(LS_PLAYERS_KEY);
     const savedRows    = localStorage.getItem(LS_ROWS_KEY);
     const savedInv     = localStorage.getItem(LS_INV_KEY);
-    if (savedPlayers) {
-      playerCountInput.value = String(Math.max(1, toInt(savedPlayers, 2)));
-    }
+
+    if (savedPlayers) playerCountInput.value = String(Math.max(1, toInt(savedPlayers, 2)));
+
     if (savedInv) {
       try {
         const invData = JSON.parse(savedInv);
-        if (Array.isArray(invData) && invData.length) {
-          invData.forEach(row => addInventoryRow(row));
-        } else {
-          DEFAULT_INVENTORY.forEach(row => addInventoryRow(row));
-        }
+        if (Array.isArray(invData) && invData.length) invData.forEach(row => addInventoryRow(row));
+        else DEFAULT_INVENTORY.forEach(row => addInventoryRow(row));
       } catch {
         DEFAULT_INVENTORY.forEach(row => addInventoryRow(row));
       }
     } else {
       DEFAULT_INVENTORY.forEach(row => addInventoryRow(row));
     }
+
     refreshColorDropdownOptions();
+
     if (savedRows) {
       try {
         const rowData = JSON.parse(savedRows);
-        if (Array.isArray(rowData) && rowData.length) {
-          rowData.forEach(row => addDashboardRow(row));
-        } else {
-          addDashboardRow();
-        }
+        if (Array.isArray(rowData) && rowData.length) rowData.forEach(row => addDashboardRow(row));
+        else addDashboardRow();
       } catch {
         addDashboardRow();
       }
     } else {
       addDashboardRow();
     }
+
     updateDashboardCount();
     updateInventoryCount();
+    updateInventoryTotals();
     calculate();
   }
 
@@ -363,20 +349,24 @@
       calculate();
       saveState();
     });
+
     playerPlusBtn.addEventListener('click', () => {
       playerCountInput.value = String(getPlayers() + 1);
       calculate();
       saveState();
     });
+
     playerCountInput.addEventListener('input', () => {
       playerCountInput.value = String(getPlayers());
       calculate();
       saveState();
     });
+
     colorPlusBtn.addEventListener('click', () => {
       addDashboardRow();
       saveState();
     });
+
     colorMinusBtn.addEventListener('click', () => {
       const rows = chipRowsEl.querySelectorAll('tr');
       if (rows.length > 1) {
@@ -390,19 +380,23 @@
       updateDashboardCount();
       saveState();
     });
+
     invPlusBtn.addEventListener('click', () => {
       addInventoryRow({ name: '', value: 0, owned: 0 });
       refreshColorDropdownOptions();
+      updateInventoryTotals();
       saveState();
     });
+
     invMinusBtn.addEventListener('click', () => {
       const rows = invRowsEl.querySelectorAll('tr');
       if (rows.length > 1) {
         rows[rows.length - 1].remove();
       }
       refreshColorDropdownOptions();
-      calculate();
       updateInventoryCount();
+      updateInventoryTotals();
+      calculate();
       saveState();
     });
   }
