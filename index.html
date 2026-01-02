@@ -10,60 +10,96 @@
   <div class="container">
     <h1>Poker Chip Calculator</h1>
 
-    <div class="controls">
-      <div class="control-group">
-        <span class="control-label">Players</span>
-        <div class="stepper">
-          <button id="player-minus" type="button" class="step-btn" aria-label="Decrease players">−</button>
-          <input type="number" id="player-count" min="1" value="2" inputmode="numeric">
-          <button id="player-plus" type="button" class="step-btn" aria-label="Increase players">+</button>
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button class="tab-btn active" type="button" role="tab" aria-selected="true" aria-controls="tab-dashboard" id="tab-btn-dashboard" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" type="button" role="tab" aria-selected="false" aria-controls="tab-inventory" id="tab-btn-inventory" data-tab="inventory">Inventory</button>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <section id="tab-dashboard" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-dashboard">
+      <div class="controls">
+        <div class="control-group">
+          <span class="control-label">Players</span>
+          <div class="stepper">
+            <button id="player-minus" type="button" class="step-btn" aria-label="Decrease players">−</button>
+            <input type="number" id="player-count" min="1" value="2" inputmode="numeric">
+            <button id="player-plus" type="button" class="step-btn" aria-label="Increase players">+</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <span class="control-label">Colors</span>
+          <div class="stepper">
+            <button id="color-minus" type="button" class="step-btn" aria-label="Remove a color row">−</button>
+            <span id="color-count" class="count-pill">0</span>
+            <button id="color-plus" type="button" class="step-btn" aria-label="Add a color row">+</button>
+          </div>
         </div>
       </div>
 
-      <div class="control-group">
-        <span class="control-label">Colors</span>
-        <div class="stepper">
-          <button id="color-minus" type="button" class="step-btn" aria-label="Remove a color row">−</button>
-          <span id="color-count" class="count-pill">0</span>
-          <button id="color-plus" type="button" class="step-btn" aria-label="Add a color row">+</button>
+      <div class="table-wrap" role="region" aria-label="Chip table" tabindex="0">
+        <table id="chip-table">
+          <thead>
+            <tr>
+              <th>Color</th>
+              <th>Value</th>
+              <th>
+                <span class="th-full">Chips per Player</span>
+                <span class="th-short">Per Player</span>
+              </th>
+              <th>
+                <span class="th-full">Chips Needed</span>
+                <span class="th-short">Needed</span>
+              </th>
+              <th>
+                <span class="th-full">Chips Left</span>
+                <span class="th-short">Left</span>
+              </th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="chip-rows"></tbody>
+        </table>
+      </div>
+
+      <div class="totals">
+        <p><span>Buy in per player</span><span id="buy-in">0</span></p>
+        <p><span>Total chips in play</span><span id="chips-in-play">0</span></p>
+        <p><span>Total value in play</span><span id="value-in-play">0</span></p>
+      </div>
+    </section>
+
+    <!-- INVENTORY TAB -->
+    <section id="tab-inventory" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-inventory">
+      <div class="controls">
+        <div class="control-group">
+          <span class="control-label">Inventory Colors</span>
+          <div class="stepper">
+            <button id="inv-minus" type="button" class="step-btn" aria-label="Remove an inventory row">−</button>
+            <span id="inv-count" class="count-pill">0</span>
+            <button id="inv-plus" type="button" class="step-btn" aria-label="Add an inventory row">+</button>
+          </div>
+        </div>
+
+        <div class="hint">
+          Edit owned counts here. The dashboard uses these numbers.
         </div>
       </div>
-    </div>
 
-    <div class="table-wrap" role="region" aria-label="Chip table" tabindex="0">
-      <table id="chip-table">
-        <thead>
-          <tr>
-            <th>Color</th>
-            <th>Value</th>
-            <th>
-              <span class="th-full">Chips per Player</span>
-              <span class="th-short">Per Player</span>
-            </th>
-            <th>
-              <span class="th-full">Total Owned</span>
-              <span class="th-short">Owned</span>
-            </th>
-            <th>
-              <span class="th-full">Chips Needed</span>
-              <span class="th-short">Needed</span>
-            </th>
-            <th>
-              <span class="th-full">Chips Left</span>
-              <span class="th-short">Left</span>
-            </th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="chip-rows"></tbody>
-      </table>
-    </div>
+      <div class="table-wrap" role="region" aria-label="Inventory table" tabindex="0">
+        <table id="inv-table">
+          <thead>
+            <tr>
+              <th>Color</th>
+              <th>Owned</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="inv-rows"></tbody>
+        </table>
+      </div>
+    </section>
 
-    <div class="totals">
-      <p><span>Buy in per player</span><span id="buy-in">0</span></p>
-      <p><span>Total chips in play</span><span id="chips-in-play">0</span></p>
-      <p><span>Total value in play</span><span id="value-in-play">0</span></p>
-    </div>
   </div>
 
   <script src="script.js"></script>
