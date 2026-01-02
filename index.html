@@ -19,6 +19,7 @@
           <button id="player-plus" type="button" class="step-btn" aria-label="Increase players">+</button>
         </div>
       </div>
+
       <div class="control-group">
         <span class="control-label">Colors</span>
         <div class="stepper">
@@ -46,35 +47,41 @@
     </div>
 
     <div class="totals">
-      <p><span>Buy in per player</span><span id="buy-in">0</span></p>
+      <p><span>Buy in per player</span><span id="buy-in">$0.00</span></p>
       <p><span>Total chips in play</span><span id="chips-in-play">0</span></p>
-      <p><span>Total value in play</span><span id="value-in-play">0</span></p>
+      <p><span>Total value in play</span><span id="value-in-play">$0.00</span></p>
     </div>
 
     <div class="inventory-section">
-      <h2>Owned Chips</h2>
+      <h2>Inventory</h2>
+
       <div class="controls" id="inventory-controls">
         <div class="control-group">
-          <span class="control-label">Owned Colors</span>
+          <span class="control-label">Inventory Colors</span>
           <div class="stepper">
-            <button id="inv-minus" type="button" class="step-btn" aria-label="Remove an owned color row">−</button>
+            <button id="inv-minus" type="button" class="step-btn" aria-label="Remove an inventory row">−</button>
             <span id="inv-count" class="count-pill">0</span>
-            <button id="inv-plus" type="button" class="step-btn" aria-label="Add an owned color row">+</button>
+            <button id="inv-plus" type="button" class="step-btn" aria-label="Add an inventory row">+</button>
           </div>
         </div>
       </div>
+
       <div class="table-wrap">
         <table id="inv-table">
           <thead>
             <tr>
               <th>Color</th>
-              <th>Value</th>
+              <th>Value ($)</th>
               <th>Owned</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody id="inv-rows"></tbody>
         </table>
+      </div>
+
+      <div class="inventory-totals">
+        <p><span>Total chips owned</span><span id="inv-total-owned">0</span></p>
       </div>
     </div>
 
