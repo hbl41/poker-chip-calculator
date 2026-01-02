@@ -1,4 +1,4 @@
-(function() {
+(function () {
   const playerCountInput = document.getElementById('player-count');
   const playerMinusBtn = document.getElementById('player-minus');
   const playerPlusBtn = document.getElementById('player-plus');
@@ -18,13 +18,10 @@
   const chipsInPlayEl = document.getElementById('chips-in-play');
   const valueInPlayEl = document.getElementById('value-in-play');
 
-  const tabButtons = Array.from(document.querySelectorAll('.tab-btn'));
-  const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
-
   const COLOR_CLASSES = [
     'chip-white',
-    'chip-red',
     'chip-pink',
+    'chip-red',
     'chip-blue',
     'chip-green',
     'chip-black',
@@ -67,17 +64,6 @@
 
   function updateInventoryCount() {
     if (invCountEl) invCountEl.textContent = String(invRowCount());
-  }
-
-  function showTab(tabName) {
-    tabButtons.forEach(btn => {
-      const isActive = btn.dataset.tab === tabName;
-      btn.classList.toggle('active', isActive);
-      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-    });
-    tabPanels.forEach(panel => {
-      panel.classList.toggle('active', panel.id === 'tab-' + tabName);
-    });
   }
 
   function applyColorClass(tr, colorName) {
@@ -124,9 +110,9 @@
       inv.push({ name, owned });
     });
 
-    localStorage.setItem('pokerChipRows_v2', JSON.stringify(rows));
-    localStorage.setItem('pokerChipPlayers_v2', String(getPlayers()));
-    localStorage.setItem('pokerChipInventory_v2', JSON.stringify(inv));
+    localStorage.setItem('pokerChipRows_v3', JSON.stringify(rows));
+    localStorage.setItem('pokerChipPlayers_v3', String(getPlayers()));
+    localStorage.setItem('pokerChipInventory_v3', JSON.stringify(inv));
   }
 
   function addDashboardRow(data = {}) {
@@ -246,9 +232,9 @@
   }
 
   function loadState() {
-    const savedPlayers = localStorage.getItem('pokerChipPlayers_v2');
-    const savedRows = localStorage.getItem('pokerChipRows_v2');
-    const savedInv = localStorage.getItem('pokerChipInventory_v2');
+    const savedPlayers = localStorage.getItem('pokerChipPlayers_v3');
+    const savedRows = localStorage.getItem('pokerChipRows_v3');
+    const savedInv = localStorage.getItem('pokerChipInventory_v3');
 
     if (savedPlayers) playerCountInput.value = String(Math.max(1, toInt(savedPlayers, 2)));
 
@@ -272,12 +258,6 @@
     updateInventoryCount();
     calculate();
   }
-
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      showTab(btn.dataset.tab);
-    });
-  });
 
   playerMinusBtn.addEventListener('click', () => {
     playerCountInput.value = String(Math.max(1, getPlayers() - 1));
@@ -331,6 +311,5 @@
     saveState();
   });
 
-  showTab('dashboard');
   loadState();
 })();
