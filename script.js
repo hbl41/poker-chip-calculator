@@ -1,30 +1,25 @@
 (function() {
   const playerCountInput = document.getElementById('player-count');
+
   const playerMinusBtn = document.getElementById('player-minus');
   const playerPlusBtn = document.getElementById('player-plus');
 
   const colorMinusBtn = document.getElementById('color-minus');
   const colorPlusBtn = document.getElementById('color-plus');
-  const colorCountOut = document.getElementById('color-count');
+  const colorCountEl = document.getElementById('color-count');
 
   const chipRowsEl = document.getElementById('chip-rows');
   const buyInEl = document.getElementById('buy-in');
   const chipsInPlayEl = document.getElementById('chips-in-play');
   const valueInPlayEl = document.getElementById('value-in-play');
 
-  const MIN_PLAYERS = 1;
-  const MIN_ROWS = 1;
-
-  function getPlayerCount() {
-    const v = parseInt(playerCountInput.value, 10);
-    return Number.isFinite(v) ? v : 0;
+  function toInt(v, fallback) {
+    const n = parseInt(v, 10);
+    return Number.isFinite(n) ? n : fallback;
   }
 
-  function setPlayerCount(next) {
-    const clamped = Math.max(MIN_PLAYERS, parseInt(next, 10) || MIN_PLAYERS);
-    playerCountInput.value = clamped;
-    calculate();
-    saveState();
+  function getPlayers() {
+    return Math.max(1, toInt(playerCountInput.value, 1));
   }
 
   function rowCount() {
@@ -32,41 +27,9 @@
   }
 
   function updateColorCount() {
-    if (!colorCountOut) return;
-    colorCountOut.textContent = String(rowCount());
+    if (colorCountEl) colorCountEl.textContent = String(rowCount());
   }
 
-  // Load saved state from localStorage
-  function loadState() {
-    const savedRows = localStorage.getItem('pokerChipRows');
-    const savedPlayers = localStorage.getItem('pokerChipPlayers');
-
-    if (savedPlayers) {
-      const parsed = parseInt(savedPlayers, 10);
-      playerCountInput.value = Number.isFinite(parsed) ? parsed : MIN_PLAYERS;
-    }
-
-    if (savedRows) {
-      try {
-        const rows = JSON.parse(savedRows);
-        if (Array.isArray(rows) && rows.length) {
-          rows.forEach(row => addRow(row));
-        } else {
-          addRow();
-        }
-      } catch (e) {
-        addRow();
-      }
-    } else {
-      addRow();
-    }
-
-    if (getPlayerCount() < MIN_PLAYERS) playerCountInput.value = MIN_PLAYERS;
-    updateColorCount();
-    calculate();
-  }
-
-  // Save current state to localStorage
   function saveState() {
     const rows = [];
     chipRowsEl.querySelectorAll('tr').forEach(tr => {
@@ -76,12 +39,11 @@
       const owned = parseFloat(tr.querySelector('.chips-owned').value) || 0;
       rows.push({ name, value, perPlayer, owned });
     });
+
     localStorage.setItem('pokerChipRows', JSON.stringify(rows));
-    localStorage.setItem('pokerChipPlayers', String(getPlayerCount()));
-    updateColorCount();
+    localStorage.setItem('pokerChipPlayers', String(getPlayers()));
   }
 
-  // Add a new row to the table
   function addRow(data = {}) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -94,7 +56,6 @@
       <td><button class="remove-row" type="button">Remove</button></td>
     `;
 
-    // Input listeners
     tr.querySelectorAll('input').forEach(input => {
       input.addEventListener('input', () => {
         calculate();
@@ -102,31 +63,28 @@
       });
     });
 
-    // Per-row remove button
     tr.querySelector('.remove-row').addEventListener('click', () => {
-      const countBefore = rowCount();
-      if (countBefore <= MIN_ROWS) return;
       tr.remove();
+      if (rowCount() === 0) addRow();
       calculate();
+      updateColorCount();
       saveState();
     });
 
     chipRowsEl.appendChild(tr);
+    calculate();
     updateColorCount();
-    calculate();
   }
 
-  function removeLastRow() {
-    const rows = chipRowsEl.querySelectorAll('tr');
-    if (rows.length <= MIN_ROWS) return;
-    rows[rows.length - 1].remove();
-    calculate();
-    saveState();
+  function clearRowInputs(tr) {
+    tr.querySelector('.color-name').value = '';
+    tr.querySelector('.chip-value').value = '';
+    tr.querySelector('.chips-per-player').value = '';
+    tr.querySelector('.chips-owned').value = '';
   }
 
-  // Calculate totals and update cells
   function calculate() {
-    const players = getPlayerCount();
+    const players = getPlayers();
     let buyInPerPlayer = 0;
     let totalChipsInPlay = 0;
 
@@ -142,29 +100,51 @@
 
       const chipsLeftEl = tr.querySelector('.chips-left');
       chipsLeftEl.textContent = chipsLeft;
-      if (chipsLeft < 0) {
-        chipsLeftEl.classList.add('color-negative');
-      } else {
-        chipsLeftEl.classList.remove('color-negative');
-      }
+
+      if (chipsLeft < 0) chipsLeftEl.classList.add('color-negative');
+      else chipsLeftEl.classList.remove('color-negative');
 
       buyInPerPlayer += value * perPlayer;
       totalChipsInPlay += chipsNeeded;
     });
 
-    const totalValueInPlay = buyInPerPlayer * players;
     buyInEl.textContent = buyInPerPlayer.toFixed(2);
-    chipsInPlayEl.textContent = String(totalChipsInPlay);
-    valueInPlayEl.textContent = totalValueInPlay.toFixed(2);
-    updateColorCount();
+    chipsInPlayEl.textContent = totalChipsInPlay;
+    valueInPlayEl.textContent = (buyInPerPlayer * players).toFixed(2);
   }
 
-  // Top controls
-  playerMinusBtn.addEventListener('click', () => setPlayerCount(getPlayerCount() - 1));
-  playerPlusBtn.addEventListener('click', () => setPlayerCount(getPlayerCount() + 1));
+  function loadState() {
+    const savedPlayers = localStorage.getItem('pokerChipPlayers');
+    const savedRows = localStorage.getItem('pokerChipRows');
+
+    if (savedPlayers) playerCountInput.value = String(Math.max(1, toInt(savedPlayers, 2)));
+
+    if (savedRows) {
+      const rows = JSON.parse(savedRows);
+      if (Array.isArray(rows) && rows.length) rows.forEach(r => addRow(r));
+      else addRow();
+    } else {
+      addRow();
+    }
+
+    updateColorCount();
+    calculate();
+  }
+
+  playerMinusBtn.addEventListener('click', () => {
+    playerCountInput.value = String(Math.max(1, getPlayers() - 1));
+    calculate();
+    saveState();
+  });
+
+  playerPlusBtn.addEventListener('click', () => {
+    playerCountInput.value = String(getPlayers() + 1);
+    calculate();
+    saveState();
+  });
 
   playerCountInput.addEventListener('input', () => {
-    if (getPlayerCount() < MIN_PLAYERS) playerCountInput.value = MIN_PLAYERS;
+    playerCountInput.value = String(getPlayers()));
     calculate();
     saveState();
   });
@@ -175,9 +155,18 @@
   });
 
   colorMinusBtn.addEventListener('click', () => {
-    removeLastRow();
+    const rows = chipRowsEl.querySelectorAll('tr');
+    if (rows.length > 1) {
+      rows[rows.length - 1].remove();
+    } else if (rows.length === 1) {
+      clearRowInputs(rows[0]);
+    } else {
+      addRow();
+    }
+    calculate();
+    updateColorCount();
+    saveState();
   });
 
-  // Initialize
   loadState();
 })();
