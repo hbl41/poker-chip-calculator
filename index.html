@@ -28,6 +28,14 @@
           <button id="color-plus" type="button" class="step-btn" aria-label="Add color row">+</button>
         </div>
       </div>
+
+      <div class="control-group">
+        <span class="control-label">BB ($)</span>
+        <div class="stepper">
+          <input type="number" id="bb-amount" min="0" step="0.01" value="1" inputmode="decimal" aria-label="Big blind amount in dollars">
+          <span class="count-pill" id="bbs-per-player">0.00 BB</span>
+        </div>
+      </div>
     </div>
 
     <div class="table-wrap">
@@ -36,6 +44,7 @@
           <tr>
             <th>Color</th>
             <th>Value</th>
+            <th>Denom</th>
             <th>Chips per Player</th>
             <th>Chips Needed</th>
             <th>Chips Left</th>
@@ -55,23 +64,13 @@
     <div class="inventory-section">
       <h2>Inventory</h2>
 
-      <div class="controls" id="inventory-controls">
-        <div class="control-group">
-          <span class="control-label">Inventory Colors</span>
-          <div class="stepper">
-            <button id="inv-minus" type="button" class="step-btn" aria-label="Remove an inventory row">−</button>
-            <span id="inv-count" class="count-pill">0</span>
-            <button id="inv-plus" type="button" class="step-btn" aria-label="Add an inventory row">+</button>
-          </div>
-        </div>
-      </div>
-
       <div class="table-wrap">
         <table id="inv-table">
           <thead>
             <tr>
               <th>Color</th>
               <th>Value ($)</th>
+              <th>Denom</th>
               <th>Owned</th>
               <th>Action</th>
             </tr>
