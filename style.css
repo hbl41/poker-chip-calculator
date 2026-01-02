@@ -15,48 +15,49 @@ h1 {
 
 .controls {
   display: flex;
-  gap: 16px;
-  align-items: flex-end;
+  gap: 14px;
+  align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .control-group {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
 }
 
-.control-group label {
+.control-label {
   font-weight: bold;
 }
 
 .stepper {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-.stepper-btn {
-  padding: 4px 10px;
+.step-btn {
+  padding: 6px 10px;
+  min-width: 40px;
   font-size: 18px;
   line-height: 1;
-  cursor: pointer;
 }
 
-#player-count {
-  width: 90px;
-  padding: 4px;
-}
-
-.stepper-count {
-  min-width: 32px;
+.count-pill {
+  display: inline-block;
+  min-width: 34px;
   text-align: center;
-  font-weight: bold;
-  padding: 4px 6px;
+  padding: 6px 8px;
   border: 1px solid #ccc;
-  border-radius: 2px;
-  background: #fff;
+  background: #f2f2f2;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.controls input[type="number"] {
+  width: 90px;
+  padding: 6px;
 }
 
 #chip-table {
@@ -68,44 +69,44 @@ h1 {
 #chip-table td {
   border: 1px solid #ccc;
   padding: 8px;
-  text-align: center;
+  text-align: left;
+  vertical-align: middle;
 }
 
-#chip-table thead {
-  background-color: #f2f2f2;
+#chip-table input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px;
 }
 
-#chip-table td.color-negative {
-  color: #d00;
-  font-weight: bold;
-}
-
-#chip-table button.remove-row {
-  padding: 2px 6px;
-  cursor: pointer;
-}
-
-.totals {
-  margin-top: 10px;
-  background: #f9f9f9;
+.summary {
+  margin-top: 14px;
+  border: 1px solid #ccc;
   padding: 10px;
-  border: 1px solid #ddd;
 }
 
-.totals p {
-  margin: 4px 0;
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.color-negative {
+  color: red;
   font-weight: bold;
 }
 
-@media (max-width: 600px) {
-  .controls {
-    flex-direction: column;
-    align-items: flex-start;
+@media (max-width: 640px) {
+  body {
+    padding: 12px;
   }
 
-  #chip-table th,
-  #chip-table td {
-    font-size: 14px;
-    padding: 6px;
+  .controls input[type="number"] {
+    width: 80px;
+  }
+
+  #chip-table th:nth-child(7),
+  #chip-table td:nth-child(7) {
+    width: 90px;
   }
 }
