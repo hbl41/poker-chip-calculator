@@ -13,26 +13,11 @@ body {
   border: 1px solid #e1e1e1;
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-h1 {
-  text-align: center;
-  margin: 0 0 16px 0;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-h2 {
-  margin: 20px 0 12px 0;
-  font-size: 20px;
-  font-weight: 700;
 }
 
 .controls {
   display: flex;
   gap: 16px;
-  align-items: center;
   flex-wrap: wrap;
   margin-bottom: 16px;
   background: #fafafa;
@@ -47,56 +32,13 @@ h2 {
   gap: 8px;
 }
 
-.control-label {
-  font-weight: 600;
-}
-
-.stepper {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
 .step-btn {
   padding: 8px 12px;
-  min-width: 40px;
   font-size: 18px;
-  line-height: 1;
   background: #eee;
   border: 1px solid #ccc;
   border-radius: 8px;
   cursor: pointer;
-  user-select: none;
-}
-
-.step-btn:hover {
-  background: #e0e0e0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-#player-count {
-  width: 80px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 16px;
-}
-
-#bb-amount {
-  width: 110px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 16px;
 }
 
 .count-pill {
@@ -111,11 +53,8 @@ input::-webkit-inner-spin-button {
 
 .table-wrap {
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   border: 1px solid #e6e6e6;
   border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 table {
@@ -124,126 +63,25 @@ table {
   min-width: 980px;
 }
 
-#inv-table {
-  min-width: 820px;
-}
-
-thead {
-  background-color: #e9eef5;
-}
-
-th {
-  padding: 10px;
-  text-align: left;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-td {
+th, td {
   padding: 10px;
   border-bottom: 1px solid #ededed;
 }
 
-tbody tr:nth-child(even) td {
-  background-color: #fbfbfb;
+thead {
+  background: #e9eef5;
 }
 
-input[type="text"],
-input[type="number"],
-select.color-select {
+input, select {
   width: 100%;
-  box-sizing: border-box;
   padding: 8px;
   border: 1px solid #cfcfcf;
   border-radius: 8px;
-  font-size: 16px;
-  color: #000;
-  background-color: #fff;
 }
 
-.value-display {
-  font-weight: 700;
-}
-
-button.remove-row,
-button.remove-inv-row {
-  padding: 6px 10px;
-  background: #eee;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-button.remove-row:hover,
-button.remove-inv-row:hover {
-  background: #dcdcdc;
-}
-
-button[disabled] {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.totals {
-  margin-top: 16px;
-  padding: 12px 16px;
-  background: #fafafa;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-}
-
-/* Label and value sit next to each other */
-.totals p {
-  margin: 4px 0;
-  display: flex;
-  justify-content: flex-start;
-  gap: 10px;
-  font-weight: 700;
-}
-
-.inventory-totals {
-  margin-top: 12px;
-  padding: 12px 16px;
-  background: #fafafa;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-}
-
-/* Label and value sit next to each other */
+.totals p,
 .inventory-totals p {
-  margin: 0;
   display: flex;
-  justify-content: flex-start;
   gap: 10px;
   font-weight: 700;
-}
-
-@media (max-width: 720px) {
-  body {
-    padding: 16px;
-  }
-
-  .container {
-    padding: 16px;
-  }
-
-  .controls {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .totals {
-    grid-template-columns: 1fr;
-  }
-
-  table {
-    min-width: 980px;
-  }
 }
