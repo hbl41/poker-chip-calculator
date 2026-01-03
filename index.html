@@ -1,135 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poker Chip Calculator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f0f0f0;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .input-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e8f5e9;
-            border-left: 4px solid #4CAF50;
-            border-radius: 4px;
-            display: none;
-        }
-        .result.show {
-            display: block;
-        }
-        .result h2 {
-            margin-top: 0;
-            color: #2e7d32;
-        }
-        .chip-info {
-            margin: 10px 0;
-            font-size: 16px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poker Chip Calculator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Poker Chip Calculator</h1>
-        <form id="calculatorForm">
-            <div class="input-group">
-                <label for="player-count">Number of Players:</label>
-                <input type="number" id="player-count" name="player-count" value="8" min="2" max="10" required>
-            </div>
-            <div class="input-group">
-                <label for="buy-in">Buy-in Amount ($):</label>
-                <input type="number" id="buy-in" name="buy-in" value="100" min="1" step="0.01" required>
-            </div>
-            <div class="input-group">
-                <label for="sb-amount">Small Blind ($):</label>
-                <input type="number" id="sb-amount" name="sb-amount" value="0.5" min="0.01" step="0.01" required>
-            </div>
-            <div class="input-group">
-                <label for="bb-amount">Big Blind ($):</label>
-                <input type="number" id="bb-amount" name="bb-amount" value="0.25" min="0.01" step="0.01" required>
-            </div>
-            <button type="submit">Calculate</button>
-        </form>
-        <div id="result" class="result">
-            <h2>Results:</h2>
-            <div class="chip-info">
-                <strong>Total Chips Needed:</strong> <span id="totalChips">0</span>
-            </div>
-            <div class="chip-info">
-                <strong>Chips per Player:</strong> <span id="chipsPerPlayer">0</span>
-            </div>
-            <div class="chip-info">
-                <strong>Total Money in Play:</strong> $<span id="totalMoney">0</span>
-            </div>
+  <div class="container">
+    <h1>Poker Chip Calculator</h1>
+
+    <div class="controls" id="dashboard-controls">
+      <div class="control-group">
+        <span class="control-label">Players</span>
+        <div class="stepper">
+          <button id="player-minus" type="button" class="step-btn" aria-label="Decrease players">−</button>
+          <input type="number" id="player-count" min="1" value="8" inputmode="numeric">
+          <button id="player-plus" type="button" class="step-btn" aria-label="Increase players">+</button>
         </div>
+      </div>
+
+      <div class="control-group">
+        <span class="control-label">Colors</span>
+        <div class="stepper">
+          <button id="color-minus" type="button" class="step-btn" aria-label="Remove color row">−</button>
+          <span id="color-count" class="count-pill">0</span>
+          <button id="color-plus" type="button" class="step-btn" aria-label="Add color row">+</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <span class="control-label">BB ($)</span>
+        <div class="stepper">
+          <input type="number" id="bb-amount" min="0" step="0.01" value="0.25" inputmode="decimal" aria-label="Big blind amount in dollars">
+          <span class="count-pill" id="bbs-per-player">0.00 BB</span>
+        </div>
+      </div>
     </div>
 
-    <script>
-        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const playerCount = parseInt(document.getElementById('player-count').value);
-            const buyIn = parseFloat(document.getElementById('buy-in').value);
-            const sbAmount = parseFloat(document.getElementById('sb-amount').value);
-            const bbAmount = parseFloat(document.getElementById('bb-amount').value);
-            
-            // Calculate total chips needed (assuming 1 chip = $1)
-            const totalMoney = playerCount * buyIn;
-            const totalChips = Math.ceil(totalMoney);
-            const chipsPerPlayer = Math.ceil(totalChips / playerCount);
-            
-            // Display results
-            document.getElementById('totalChips').textContent = totalChips;
-            document.getElementById('chipsPerPlayer').textContent = chipsPerPlayer;
-            document.getElementById('totalMoney').textContent = totalMoney.toFixed(2);
-            document.getElementById('result').classList.add('show');
-        });
-    </script>
+    <div class="table-wrap">
+      <table id="chip-table">
+        <thead>
+          <tr>
+            <th>Color</th>
+            <th>Value</th>
+            <th>Denom</th>
+            <th>Chips per Player</th>
+            <th>Chips Needed</th>
+            <th>Inventory Left</th>
+            <th>Buy-ins Left</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="chip-rows"></tbody>
+      </table>
+    </div>
+
+    <div class="totals">
+      <p><span>Buy in per player</span><span id="buy-in">$0.00</span></p>
+      <p><span>Total chips in play</span><span id="chips-in-play">0</span></p>
+      <p><span>Total value in play</span><span id="value-in-play">$0.00</span></p>
+    </div>
+
+    <div class="inventory-section">
+      <h2>Inventory</h2>
+
+      <div class="table-wrap">
+        <table id="inv-table">
+          <thead>
+            <tr>
+              <th>Color</th>
+              <th>Value ($)</th>
+              <th>Denom</th>
+              <th>Owned</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="inv-rows"></tbody>
+        </table>
+      </div>
+
+      <div class="inventory-totals">
+        <p><span>Total chips owned</span><span id="inv-total-owned">0</span></p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
