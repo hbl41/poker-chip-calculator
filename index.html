@@ -10,23 +10,80 @@
   <div class="container">
     <h1>Poker Chip Calculator</h1>
 
-    <div class="controls">
-      <label for="numPlayers">Number of Players:</label>
-      <input type="number" id="numPlayers" min="1" value="8">
+    <div class="controls" id="dashboard-controls">
+      <div class="control-group">
+        <span class="control-label">Players</span>
+        <div class="stepper">
+          <button id="player-minus" type="button" class="step-btn">−</button>
+          <input type="number" id="player-count" min="1" value="8">
+          <button id="player-plus" type="button" class="step-btn">+</button>
+        </div>
+      </div>
 
-      <label for="buyIn">Buy-in Amount (per player):</label>
-      <input type="number" id="buyIn" min="0" step="0.01" value="20">
+      <div class="control-group">
+        <span class="control-label">Colors</span>
+        <div class="stepper">
+          <button id="color-minus" type="button" class="step-btn">−</button>
+          <span id="color-count" class="count-pill">0</span>
+          <button id="color-plus" type="button" class="step-btn">+</button>
+        </div>
+      </div>
 
-      <label for="chipValues">Chip Values (comma separated):</label>
-      <input type="text" id="chipValues" value="0.25,0.5,1,5">
-
-      <label for="chipCounts">Chip Counts Available (comma separated):</label>
-      <input type="text" id="chipCounts" value="200,200,200,100">
-
-      <button id="calculateBtn" type="button">Calculate Distribution</button>
+      <div class="control-group">
+        <span class="control-label">BB ($)</span>
+        <div class="stepper">
+          <input type="number" id="bb-amount" min="0" step="0.01" value="0.25">
+          <span class="count-pill" id="bbs-per-player">0.00 BB</span>
+        </div>
+      </div>
     </div>
 
-    <div id="result"></div>
+    <div class="table-wrap">
+      <table id="chip-table">
+        <thead>
+          <tr>
+            <th>Color</th>
+            <th>Value</th>
+            <th>Denom</th>
+            <th>Chips / Player</th>
+            <th>Chips Needed</th>
+            <th>Inventory Left</th>
+            <th>Buy-ins Left</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="chip-rows"></tbody>
+      </table>
+    </div>
+
+    <div class="totals">
+      <p><span>Buy in per player</span><span id="buy-in">$0.00</span></p>
+      <p><span>Total chips in play</span><span id="chips-in-play">0</span></p>
+      <p><span>Total value in play</span><span id="value-in-play">$0.00</span></p>
+    </div>
+
+    <div class="inventory-section">
+      <h2>Inventory</h2>
+
+      <div class="table-wrap">
+        <table id="inv-table">
+          <thead>
+            <tr>
+              <th>Color</th>
+              <th>Value ($)</th>
+              <th>Denom</th>
+              <th>Owned</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="inv-rows"></tbody>
+        </table>
+      </div>
+
+      <div class="inventory-totals">
+        <p><span>Total chips owned</span><span id="inv-total-owned">0</span></p>
+      </div>
+    </div>
   </div>
 
   <script src="script.js"></script>
