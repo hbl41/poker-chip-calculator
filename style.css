@@ -202,9 +202,9 @@ button[disabled] {
 .totals p {
   margin: 4px 0;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 10px;
   font-weight: 700;
-}
 
 .inventory-totals {
   margin-top: 12px;
@@ -217,7 +217,8 @@ button[disabled] {
 .inventory-totals p {
   margin: 0;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 10px;
   font-weight: 700;
 }
 
