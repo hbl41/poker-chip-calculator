@@ -1,14 +1,17 @@
 function loadState() {
-  const savedState = localStorage.getItem('pokerChipState');
-  
-  if (savedState) {
-    // Load existing state
-    const state = JSON.parse(savedState);
-    state.rows.forEach(row => addRow(row));
+  const savedRows = localStorage.getItem('dashboardRows');
+  if (savedRows) {
+    try {
+      const rows = JSON.parse(savedRows);
+      if (Array.isArray(rows) && rows.length) {
+        rows.forEach(r => addDashboardRow(r));
+      } else {
+        for (let i = 0; i < 3; i++) addDashboardRow();
+      }
+    } catch {
+      for (let i = 0; i < 3; i++) addDashboardRow();
+    }
   } else {
-    // Initialize with 3 rows on first load
-    addRow();
-    addRow();
-    addRow();
+    for (let i = 0; i < 3; i++) addDashboardRow();
   }
 }
