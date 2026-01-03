@@ -199,7 +199,7 @@ button[disabled] {
   gap: 12px;
 }
 
-/* CHANGED: label and value sit next to each other */
+/* Label and value sit next to each other */
 .totals p {
   margin: 4px 0;
   display: flex;
@@ -216,7 +216,7 @@ button[disabled] {
   border-radius: 8px;
 }
 
-/* CHANGED: label and value sit next to each other */
+/* Label and value sit next to each other */
 .inventory-totals p {
   margin: 0;
   display: flex;
@@ -229,16 +229,20 @@ button[disabled] {
   body {
     padding: 16px;
   }
+
   .container {
     padding: 16px;
   }
+
   .controls {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .totals {
     grid-template-columns: 1fr;
   }
+
   table {
     min-width: 980px;
   }
