@@ -1,93 +1,136 @@
-// Poker Chip Calculator JavaScript Logic
+(function () {
+  const chipRowsEl = document.getElementById('chip-rows');
+  const invRowsEl = document.getElementById('inv-rows');
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Elements
-  const playersInput = document.getElementById('numPlayers');
-  const buyInInput = document.getElementById('buyIn');
-  const chipValuesInput = document.getElementById('chipValues');
-  const chipCountsInput = document.getElementById('chipCounts');
-  const calculateBtn = document.getElementById('calculateBtn');
-  const resultDiv = document.getElementById('result');
+  const playerCountInput = document.getElementById('player-count');
+  const bbAmountInput = document.getElementById('bb-amount');
 
-  function parseCSV(input) {
-    return input.split(',').map(Number).filter(n => !isNaN(n));
+  const buyInEl = document.getElementById('buy-in');
+  const chipsInPlayEl = document.getElementById('chips-in-play');
+  const valueInPlayEl = document.getElementById('value-in-play');
+  const bbsPerPlayerEl = document.getElementById('bbs-per-player');
+  const invTotalOwnedEl = document.getElementById('inv-total-owned');
+
+  function normalize(name) {
+    return (name || '').trim().toLowerCase();
   }
 
-  function formatChipDistribution(distribution, chipValues) {
-    let html = '<table><thead><tr><th>Chip Value</th><th>Per Player</th><th>Total Needed</th></tr></thead><tbody>';
-    for(let i=0; i<chipValues.length; i++) {
-      html += `<tr><td>${chipValues[i]}</td><td>${distribution.perPlayer[i]}</td><td>${distribution.totalNeeded[i]}</td></tr>`;
-    }
-    html += '</tbody></table>';
-    return html;
+  function currency(v) {
+    return '$' + (Number(v) || 0).toFixed(2);
   }
 
-  function calculateDistribution(numPlayers, buyIn, chipValues, chipCounts) {
-    // Simple greedy distribution algorithm
-    let totalChips = chipCounts.slice();
-    let perPlayer = Array(chipValues.length).fill(0);
-    let totalNeeded = Array(chipValues.length).fill(0);
-    let remaining = buyIn;
-    let tempDist = Array(chipValues.length).fill(0);
+  function getInventory() {
+    const map = {};
+    invRowsEl.querySelectorAll('tr').forEach(r => {
+      const name = r.querySelector('.inv-color').value;
+      const key = normalize(name);
+      if (!key) return;
+      map[key] = {
+        value: Number(r.querySelector('.inv-value').value) || 0,
+        denom: r.querySelector('.inv-denom').value || '',
+        owned: Number(r.querySelector('.inv-owned').value) || 0
+      };
+    });
+    return map;
+  }
 
-    // Attempt to give each player maximum denomination first
-    for(let i=chipValues.length-1; i>=0; i--) {
-      let maxChipsPerPlayer = Math.min(Math.floor(remaining/chipValues[i]), Math.floor(totalChips[i]/numPlayers));
-      tempDist[i] = maxChipsPerPlayer;
-      remaining -= maxChipsPerPlayer * chipValues[i];
-    }
+  function recalc() {
+    const players = Number(playerCountInput.value) || 1;
+    const bb = Number(bbAmountInput.value) || 0;
+    const inv = getInventory();
 
-    // If remainder exists, try to use lowest denominations to fill in
-    for(let i=0; i<chipValues.length; i++) {
-      let needed = Math.round(remaining/chipValues[i]);
-      if(needed > 0 && totalChips[i] >= needed*numPlayers) {
-        tempDist[i] += needed;
-        remaining -= needed*chipValues[i];
-        break;
-      }
-    }
+    let buyIn = 0;
+    let totalChips = 0;
+    let invTotal = 0;
 
-    // Now fill out per player and total needed arrays
-    let possible = true;
-    for(let i=0; i<chipValues.length; i++) {
-      perPlayer[i] = tempDist[i];
-      totalNeeded[i] = perPlayer[i]*numPlayers;
-      if(totalNeeded[i] > totalChips[i]) {
-        possible = false;
-      }
-    }
+    Object.values(inv).forEach(i => invTotal += i.owned);
+    invTotalOwnedEl.textContent = invTotal;
 
-    return {
-      possible: possible && remaining === 0,
-      perPlayer,
-      totalNeeded,
-      buyInActual: buyIn - remaining
+    chipRowsEl.querySelectorAll('tr').forEach(r => {
+      const color = r.querySelector('.color-select').value;
+      const per = Number(r.querySelector('.chips-per-player').value) || 0;
+      const item = inv[color] || { value: 0, denom: '', owned: 0 };
+
+      const needed = players * per;
+      const left = item.owned - needed;
+
+      r.querySelector('.chip-value').textContent = currency(item.value);
+      r.querySelector('.chip-denom').textContent = item.denom;
+      r.querySelector('.chips-needed').textContent = needed;
+      r.querySelector('.inv-left').textContent = left;
+      r.querySelector('.buyins-left').textContent =
+        needed > 0 ? (left / needed).toFixed(2) : '—';
+
+      buyIn += item.value * per;
+      totalChips += needed;
+    });
+
+    buyInEl.textContent = currency(buyIn);
+    chipsInPlayEl.textContent = totalChips;
+    valueInPlayEl.textContent = currency(buyIn * players);
+    bbsPerPlayerEl.textContent = bb > 0 ? (buyIn / bb).toFixed(2) + ' BB' : '0 BB';
+  }
+
+  function addInventoryRow() {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input class="inv-color"></td>
+      <td><input class="inv-value" type="number" step="0.01"></td>
+      <td><input class="inv-denom"></td>
+      <td><input class="inv-owned" type="number"></td>
+      <td><button>Remove</button></td>
+    `;
+    tr.querySelectorAll('input').forEach(i => i.oninput = recalc);
+    tr.querySelector('button').onclick = () => {
+      tr.remove();
+      recalc();
     };
+    invRowsEl.appendChild(tr);
   }
 
-  calculateBtn.addEventListener('click', function() {
-    // Read input values
-    const numPlayers = Number(playersInput.value);
-    const buyIn = Number(buyInInput.value);
-    const chipValues = parseCSV(chipValuesInput.value);
-    const chipCounts = parseCSV(chipCountsInput.value);
+  function addDashboardRow() {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><select class="color-select"></select></td>
+      <td><span class="chip-value">$0.00</span></td>
+      <td><span class="chip-denom"></span></td>
+      <td><input class="chips-per-player" type="number"></td>
+      <td class="chips-needed">0</td>
+      <td class="inv-left">0</td>
+      <td class="buyins-left">—</td>
+      <td><button>Remove</button></td>
+    `;
+    tr.querySelectorAll('input,select').forEach(i => i.oninput = recalc);
+    tr.querySelector('button').onclick = () => {
+      tr.remove();
+      recalc();
+    };
+    chipRowsEl.appendChild(tr);
+    refreshDropdowns();
+  }
 
-    resultDiv.innerHTML = '';
+  function refreshDropdowns() {
+    const colors = [];
+    invRowsEl.querySelectorAll('.inv-color').forEach(i => {
+      if (i.value.trim()) colors.push(i.value.trim());
+    });
 
-    if(
-      !numPlayers || !buyIn || !chipValues.length || !chipCounts.length ||
-      chipValues.length !== chipCounts.length || numPlayers <= 0 || buyIn <= 0
-    ) {
-      resultDiv.innerHTML = '<div class="error">Please enter valid input values.</div>';
-      return;
-    }
+    chipRowsEl.querySelectorAll('.color-select').forEach(s => {
+      const prev = s.value;
+      s.innerHTML = '<option value="">-- Select --</option>';
+      colors.forEach(c => {
+        const o = document.createElement('option');
+        o.value = normalize(c);
+        o.textContent = c;
+        s.appendChild(o);
+      });
+      s.value = prev;
+    });
+    recalc();
+  }
 
-    const distribution = calculateDistribution(numPlayers, buyIn, chipValues, chipCounts);
+  for (let i = 0; i < 7; i++) addInventoryRow();
+  for (let i = 0; i < 3; i++) addDashboardRow();
 
-    if(distribution.possible) {
-      resultDiv.innerHTML = `<h3>Chip Distribution Per Player</h3>${formatChipDistribution(distribution, chipValues)}<p>Each player will start with chips worth exactly $${buyIn}.</p>`;
-    } else {
-      resultDiv.innerHTML = `<div class="error">It is not possible to distribute chips exactly as requested with the available chips. The closest possible per player buy-in is $${distribution.buyInActual}. Please adjust chip counts or buy-in amount.</div>`;
-    }
-  });
-});
+  recalc();
+})();
