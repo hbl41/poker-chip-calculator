@@ -30,10 +30,10 @@
     { name: 'Blue', value: 0, denom: '', owned: 0 }
   ];
 
-  const LS_PLAYERS_KEY = 'pokerChipPlayers_v7';
-  const LS_ROWS_KEY = 'pokerChipRows_v7';
-  const LS_INV_KEY = 'pokerChipInventory_v7';
-  const LS_BB_KEY = 'pokerChipBB_v7';
+  const LS_PLAYERS_KEY = 'pokerChipPlayers_v8';
+  const LS_ROWS_KEY = 'pokerChipRows_v8';
+  const LS_INV_KEY = 'pokerChipInventory_v8';
+  const LS_BB_KEY = 'pokerChipBB_v8';
 
   function toInt(v, fallback) {
     const n = parseInt(v, 10);
@@ -166,7 +166,8 @@
       <td><span class="chip-denom value-display"></span></td>
       <td><input class="chips-per-player" type="number" min="0" value="${data.perPlayer != null ? data.perPlayer : ''}"></td>
       <td class="chips-needed">0</td>
-      <td class="chips-left">0</td>
+      <td class="inv-left">0</td>
+      <td class="buyins-left">—</td>
       <td><button class="remove-row" type="button">Remove</button></td>
     `;
 
@@ -256,6 +257,9 @@
     tr.querySelector('.chip-value').textContent = '$0.00';
     tr.querySelector('.chip-denom').textContent = '';
     tr.querySelector('.chips-per-player').value = '';
+    tr.querySelector('.chips-needed').textContent = '0';
+    tr.querySelector('.inv-left').textContent = '0';
+    tr.querySelector('.buyins-left').textContent = '—';
   }
 
   function calculate() {
@@ -281,7 +285,15 @@
       const left = item.owned - needed;
 
       tr.querySelector('.chips-needed').textContent = String(needed);
-      tr.querySelector('.chips-left').textContent = String(left);
+      tr.querySelector('.inv-left').textContent = String(left);
+
+      const buyinsLeftCell = tr.querySelector('.buyins-left');
+      if (needed > 0) {
+        const buyinsLeft = left / needed;
+        buyinsLeftCell.textContent = buyinsLeft.toFixed(2);
+      } else {
+        buyinsLeftCell.textContent = '—';
+      }
 
       buyInPerPlayer += item.value * perPlayer;
       totalChipsInPlay += needed;
