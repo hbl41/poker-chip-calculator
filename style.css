@@ -199,12 +199,14 @@ button[disabled] {
   gap: 12px;
 }
 
+/* CHANGED: label and value sit next to each other */
 .totals p {
   margin: 4px 0;
   display: flex;
   justify-content: flex-start;
   gap: 10px;
   font-weight: 700;
+}
 
 .inventory-totals {
   margin-top: 12px;
@@ -214,6 +216,7 @@ button[disabled] {
   border-radius: 8px;
 }
 
+/* CHANGED: label and value sit next to each other */
 .inventory-totals p {
   margin: 0;
   display: flex;
