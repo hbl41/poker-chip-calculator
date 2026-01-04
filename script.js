@@ -37,8 +37,8 @@
   function recalc() {
     const players = Number(playerCountInput.value) || 1;
     const bb = Number(bbAmountInput.value) || 0;
-    const inv = getInventory();
 
+    const inv = getInventory();
     let buyIn = 0;
     let totalChips = 0;
     let invTotal = 0;
@@ -78,10 +78,10 @@
       <td><input class="inv-value" type="number" step="0.01"></td>
       <td><input class="inv-denom"></td>
       <td><input class="inv-owned" type="number"></td>
-      <td><button>Remove</button></td>
+      <td><button class="remove-inv-row">Remove</button></td>
     `;
     tr.querySelectorAll('input').forEach(i => i.oninput = recalc);
-    tr.querySelector('button').onclick = () => {
+    tr.querySelector('.remove-inv-row').onclick = () => {
       tr.remove();
       recalc();
     };
@@ -98,13 +98,15 @@
       <td class="chips-needed">0</td>
       <td class="inv-left">0</td>
       <td class="buyins-left">—</td>
-      <td><button>Remove</button></td>
+      <td><button class="remove-row">Remove</button></td>
     `;
-    tr.querySelectorAll('input,select').forEach(i => i.oninput = recalc);
-    tr.querySelector('button').onclick = () => {
+
+    tr.querySelector('.remove-row').onclick = () => {
       tr.remove();
       recalc();
     };
+
+    tr.querySelectorAll('input,select').forEach(i => i.oninput = recalc);
     chipRowsEl.appendChild(tr);
     refreshDropdowns();
   }
@@ -112,7 +114,8 @@
   function refreshDropdowns() {
     const colors = [];
     invRowsEl.querySelectorAll('.inv-color').forEach(i => {
-      if (i.value.trim()) colors.push(i.value.trim());
+      const v = i.value.trim();
+      if (v) colors.push(v);
     });
 
     chipRowsEl.querySelectorAll('.color-select').forEach(s => {
@@ -126,9 +129,11 @@
       });
       s.value = prev;
     });
+
     recalc();
   }
 
+  // Init
   for (let i = 0; i < 7; i++) addInventoryRow();
   for (let i = 0; i < 3; i++) addDashboardRow();
 
