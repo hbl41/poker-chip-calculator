@@ -15,6 +15,11 @@ body {
   padding: 20px;
 }
 
+h1 {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
 .controls {
   display: flex;
   gap: 16px;
@@ -30,6 +35,12 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .step-btn {
@@ -72,10 +83,33 @@ thead {
   background: #e9eef5;
 }
 
+tbody tr:nth-child(even) {
+  background: #fbfbfb;
+}
+
 input, select {
   width: 100%;
   padding: 8px;
   border: 1px solid #cfcfcf;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+button.remove-row,
+button.remove-inv-row {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #eee;
+  cursor: pointer;
+}
+
+.totals,
+.inventory-totals {
+  margin-top: 16px;
+  padding: 12px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
 }
 
